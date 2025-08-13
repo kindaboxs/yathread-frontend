@@ -1,5 +1,6 @@
 "use client";
 
+import { faker } from "@faker-js/faker";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Loader2Icon } from "lucide-react";
@@ -62,6 +63,23 @@ export const SubmitView = () => {
 			});
 		},
 	});
+
+	const isDev = process.env.NODE_ENV === "development";
+
+	// Simulate a user for the post creation
+	const fakerPostData: CreatePostSchema = {
+		title: faker.lorem.sentence(),
+		url: faker.internet.url(),
+		content: faker.lorem.paragraphs(3),
+	};
+
+	const generateFakePost = () => {
+		form.reset(fakerPostData);
+		toast.info("Fake post data generated", {
+			id: "generate-fake-post",
+			description: "You can now edit the generated post data.",
+		});
+	};
 
 	const onSubmitForm = (data: CreatePostSchema) => {
 		createPost.mutate(data);
@@ -127,6 +145,17 @@ export const SubmitView = () => {
 									)}
 								/>
 							</div>
+
+							{isDev && (
+								<Button
+									type="button"
+									variant="outline"
+									onClick={generateFakePost}
+									className="w-full"
+								>
+									Generate Fake Post Data
+								</Button>
+							)}
 
 							<Button
 								type="submit"
