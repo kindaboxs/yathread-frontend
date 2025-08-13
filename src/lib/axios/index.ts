@@ -1,3 +1,5 @@
+import axios from "axios";
+
 import { axiosInstance } from "@/lib/axios/config";
 import type { CreatePostSchema } from "@/modules/post/schemas/create-post-schema";
 
@@ -13,22 +15,28 @@ export type SuccessResponse<T = void> = {
 } & (T extends void ? object : { data: T });
 
 export const postService = {
-	create: async (values: CreatePostSchema) => {
+	create: async (
+		values: CreatePostSchema
+	): Promise<SuccessResponse<{ postId: string }> | ErrorResponse> => {
 		try {
 			const response = await axiosInstance.post("/posts", values);
 
-			if (response.status !== 201) {
-				const data = response.data as ErrorResponse;
-				return data;
-			}
-
-			const data = response.data as SuccessResponse<{ postId: string }>;
+			const data = response.data;
 			return data;
 		} catch (error) {
+			if (axios.isAxiosError(error)) {
+				const err = error.response?.data as ErrorResponse;
+				return {
+					success: false,
+					message: err.message,
+					stack: err.stack,
+				};
+			}
+
 			return {
 				success: false,
-				message: String(error),
-			} as ErrorResponse;
+				message: "An unexpected error occurred while creating the post.",
+			};
 		}
 	},
 };

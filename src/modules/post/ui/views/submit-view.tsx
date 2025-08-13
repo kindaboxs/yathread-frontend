@@ -55,10 +55,10 @@ export const SubmitView = () => {
 			});
 			form.reset();
 		},
-		onError: (ctx) => {
+		onError: (error) => {
 			toast.error("Failed to create post", {
 				id: "create-post-error",
-				description: ctx.message,
+				description: error.message,
 			});
 		},
 	});
